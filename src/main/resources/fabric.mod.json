@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "dfwaypoints",
+  "version": "${version}",
+
+  "name": "DFWaypoints",
+  "description": "Navigate your plots effortlessly with DFWaypoints!",
+  "authors": [],
+  "contact": {},
+
+  "license": "All-Rights-Reserved",
+  "icon": "assets/dfwaypoints/icon.png",
+
+  "environment": "client",
+  "entrypoints": {
+    "client": ["org.aussiebox.dfwaypoints.client.DfwaypointsClient"],
+    "main": ["org.aussiebox.dfwaypoints.Dfwaypoints"]
+  },
+
+  "mixins": [
+    "dfwaypoints.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
