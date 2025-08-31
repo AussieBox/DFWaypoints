@@ -4,17 +4,18 @@
   "version": "${version}",
 
   "name": "DFWaypoints",
-  "description": "Navigate your plots effortlessly with DFWaypoints!",
-  "authors": [],
+  "description": "Keep your DiamondFire plots organised with DFWaypoints!",
+  "authors": ["AussieBox"],
   "contact": {},
 
-  "license": "All-Rights-Reserved",
+  "license": "MIT",
   "icon": "assets/dfwaypoints/icon.png",
 
   "environment": "client",
   "entrypoints": {
-    "client": ["org.aussiebox.dfwaypoints.client.DfwaypointsClient"],
-    "main": ["org.aussiebox.dfwaypoints.Dfwaypoints"]
+    "client": [
+      "org.aussiebox.dfwaypoints.Dfwaypoints"
+    ]
   },
 
   "mixins": [
