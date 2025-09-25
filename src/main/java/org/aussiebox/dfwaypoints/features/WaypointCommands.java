@@ -12,7 +12,10 @@ import net.minecraft.command.CommandRegistryAccess;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.PlaySoundFromEntityS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
-import net.minecraft.text.*;
+import net.minecraft.text.ClickEvent;
+import net.minecraft.text.HoverEvent;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
 import org.aussiebox.dfwaypoints.Dfwaypoints;
@@ -212,23 +215,15 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
                 .copy().append(
                         Text.literal("Waypoint Created. ")
                                 .styled(style -> style.withHoverEvent(
-                                                new HoverEvent(
-                                                        HoverEvent.Action.SHOW_TEXT,
-                                                        hoverText
-                                                )
+                                            new HoverEvent.ShowText(hoverText)
                                         )
                                 )
-                                .styled(
-                                        style -> style.withFont(Identifier.of("minecraft:default"))
-                                )
+                                .styled(style -> style.withFont(Identifier.of("minecraft:default")))
                 ).append(
                         Text.literal("(Hover for details)")
                                 .withColor(0xAAAAAA)
                                 .styled(style -> style.withHoverEvent(
-                                                new HoverEvent(
-                                                        HoverEvent.Action.SHOW_TEXT,
-                                                        hoverText
-                                                )
+                                            new HoverEvent.ShowText(hoverText)
                                         )
                                 )
                 );
@@ -238,10 +233,7 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
                         Text.literal("DFWaypoints ran into an issue saving waypoint data. Your waypoint has been created, but may not save upon closing the game. ")
                                 .withColor(0xFFFFFF)
                                 .styled(style -> style.withHoverEvent(
-                                                new HoverEvent(
-                                                        HoverEvent.Action.SHOW_TEXT,
-                                                        hoverText
-                                                )
+                                            new HoverEvent.ShowText(hoverText)
                                         )
                                 )
                                 .styled(
@@ -252,10 +244,7 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
                         Text.literal("(Hover for details)")
                                 .withColor(0xAAAAAA)
                                 .styled(style -> style.withHoverEvent(
-                                                new HoverEvent(
-                                                        HoverEvent.Action.SHOW_TEXT,
-                                                        hoverText
-                                                )
+                                            new HoverEvent.ShowText(hoverText)
                                         )
                                 )
                 );
@@ -351,73 +340,73 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
                     )
                     .append(
                             Text.literal("[")
-                                    .setStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/wtp " + name)))
                                     .withColor(0x55FF55)
+                                    .styled(style -> style.withClickEvent(
+                                                    new ClickEvent.RunCommand("/wtp " + name)
+                                            )
+                                    )
                                     .styled(style -> style.withHoverEvent(
-                                                    new HoverEvent(
-                                                            HoverEvent.Action.SHOW_TEXT,
-                                                            teleportHover
-                                                    )
+                                                    new HoverEvent.ShowText(teleportHover)
                                             )
                                     )
                     )
                     .append(
                             Text.literal("⌘")
-                                    .setStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/wtp " + name)))
                                     .withColor(0x23FF24)
+                                    .styled(style -> style.withClickEvent(
+                                                    new ClickEvent.RunCommand("/wtp " + name)
+                                            )
+                                    )
                                     .styled(style -> style.withHoverEvent(
-                                                    new HoverEvent(
-                                                            HoverEvent.Action.SHOW_TEXT,
-                                                            teleportHover
-                                                    )
+                                                    new HoverEvent.ShowText(teleportHover)
                                             )
                                     )
                     )
                     .append(
                             Text.literal("] ")
-                                    .setStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/wtp " + name)))
                                     .withColor(0x55FF55)
+                                    .styled(style -> style.withClickEvent(
+                                                    new ClickEvent.RunCommand("/wtp " + name)
+                                            )
+                                    )
                                     .styled(style -> style.withHoverEvent(
-                                                    new HoverEvent(
-                                                            HoverEvent.Action.SHOW_TEXT,
-                                                            teleportHover
-                                                    )
+                                                    new HoverEvent.ShowText(teleportHover)
                                             )
                                     )
                     )
                     .append(
                             Text.literal("[")
-                                    .setStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/waypoint delete " + name)))
                                     .withColor(0xFF5555)
+                                    .styled(style -> style.withClickEvent(
+                                                    new ClickEvent.RunCommand("/waypoint delete " + name)
+                                            )
+                                    )
                                     .styled(style -> style.withHoverEvent(
-                                                    new HoverEvent(
-                                                            HoverEvent.Action.SHOW_TEXT,
-                                                            deleteHover
-                                                    )
+                                                    new HoverEvent.ShowText(deleteHover)
                                             )
                                     )
                     )
                     .append(
                             Text.literal("✘")
-                                    .setStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/waypoint delete " + name)))
                                     .withColor(0xFF3535)
+                                    .styled(style -> style.withClickEvent(
+                                                    new ClickEvent.RunCommand("/waypoint delete " + name)
+                                            )
+                                    )
                                     .styled(style -> style.withHoverEvent(
-                                                    new HoverEvent(
-                                                            HoverEvent.Action.SHOW_TEXT,
-                                                            deleteHover
-                                                    )
+                                                    new HoverEvent.ShowText(deleteHover)
                                             )
                                     )
                     )
                     .append(
                             Text.literal("]")
-                                    .setStyle(Style.EMPTY.withClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/waypoint delete " + name)))
                                     .withColor(0xFF5555)
+                                    .styled(style -> style.withClickEvent(
+                                                    new ClickEvent.RunCommand("/waypoint delete " + name)
+                                            )
+                                    )
                                     .styled(style -> style.withHoverEvent(
-                                                    new HoverEvent(
-                                                            HoverEvent.Action.SHOW_TEXT,
-                                                            deleteHover
-                                                    )
+                                                    new HoverEvent.ShowText(deleteHover)
                                             )
                                     )
                     );

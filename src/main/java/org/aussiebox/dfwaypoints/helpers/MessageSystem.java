@@ -22,8 +22,7 @@ public class MessageSystem {
                                 )
                                 .styled(
                                         style -> style.withHoverEvent(
-                                                new HoverEvent(
-                                                        HoverEvent.Action.SHOW_TEXT,
+                                                new HoverEvent.ShowText(
                                                         Text.literal("DFWaypoints Mark ")
                                                                 .withColor(0xFFFFFF)
                                                                 .append(
@@ -58,8 +57,7 @@ public class MessageSystem {
                                 )
                                 .styled(
                                         style -> style.withHoverEvent(
-                                                new HoverEvent(
-                                                        HoverEvent.Action.SHOW_TEXT,
+                                                new HoverEvent.ShowText(
                                                         Text.literal("DFWaypoints Mark ")
                                                                 .withColor(0xFFFFFF)
                                                                 .append(
@@ -94,8 +92,7 @@ public class MessageSystem {
                                 )
                                 .styled(
                                         style -> style.withHoverEvent(
-                                                new HoverEvent(
-                                                        HoverEvent.Action.SHOW_TEXT,
+                                                new HoverEvent.ShowText(
                                                         Text.literal("DFWaypoints Mark ")
                                                                 .withColor(0xFFFFFF)
                                                                 .append(
