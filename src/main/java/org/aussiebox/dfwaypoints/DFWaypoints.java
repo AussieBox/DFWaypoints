@@ -10,6 +10,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.Identifier;
+import org.aussiebox.dfwaypoints.config.DFWConfig;
 import org.aussiebox.dfwaypoints.features.WaypointCommands;
 import org.aussiebox.dfwaypoints.features.WaypointTeleportCommand;
 import org.aussiebox.dfwaypoints.render.WaypointHudRenderer;
@@ -35,6 +36,7 @@ public class DFWaypoints implements ClientModInitializer {
         Waypoints.init();
 
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> {
+            DFWConfig.HANDLER.save();
             try {
                 Waypoints.save();
             } catch (IOException e) {
@@ -45,23 +47,27 @@ public class DFWaypoints implements ClientModInitializer {
             CommandSender.tick();
         });
 
+        DFWConfig.HANDLER.load();
+        DFWaypoints.LOGGER.info("[1/5] Config has been loaded.");
+
         FlintAPI.registerFeature(
                 new WaypointCommands()
         );
-        DFWaypoints.LOGGER.info("[1/4] WaypointCommands has been registered.");
+        DFWaypoints.LOGGER.info("[2/5] WaypointCommands has been registered.");
 
         FlintAPI.registerFeature(
                 new WaypointTeleportCommand()
         );
-        DFWaypoints.LOGGER.info("[2/4] WaypointTeleportCommand has been registered.");
+        DFWaypoints.LOGGER.info("[3/5] WaypointTeleportCommand has been registered.");
 
         registerKeybinds();
-        DFWaypoints.LOGGER.info("[3/4] Keybinds have been registered.");
+        DFWaypoints.LOGGER.info("[4/5] Keybinds have been registered.");
 
         HudElementRegistry.addFirst(Identifier.of(DFWaypoints.MOD_ID, "waypoint_hud"), WaypointHudRenderer::render);
-        DFWaypoints.LOGGER.info("[4/4] WaypointHudRenderer has been registered.");
+        DFWaypoints.LOGGER.info("[5/5] WaypointHudRenderer has been registered.");
 
         DFWaypoints.LOGGER.info("DFWaypoints is up and running!");
+        DFWaypoints.LOGGER.info("Report bugs or suggest features at https://github.com/AussieBox/DFWaypoints/issues.");
     }
 
     public void registerKeybinds() {

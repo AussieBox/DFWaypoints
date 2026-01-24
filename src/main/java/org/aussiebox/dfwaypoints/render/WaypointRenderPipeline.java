@@ -100,6 +100,11 @@ public class WaypointRenderPipeline implements ClientModInitializer {
 
             for (Waypoint[] waypointList : waypoints.values()) {
                 for (Waypoint waypoint : waypointList) {
+                    if (!waypoint.render) {
+                        Waypoints.waypointsLookingAt.removeDouble(waypoint);
+                        continue;
+                    }
+
                     matrices.push();
                     matrices.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
 

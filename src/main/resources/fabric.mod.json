@@ -6,7 +6,7 @@
   "name": "DFWaypoints",
   "description": "Keep your DiamondFire plots organised with DFWaypoints!",
   "contributors": ["zBinFinn", "settings.gradle.kts (DasDar)"],
-  "authors": ["AussieBox"],
+  "authors": ["AussieBox (aka. Circuitweaver)"],
   "contact": {},
 
   "license": "MIT",
@@ -17,6 +17,9 @@
     "client": [
       "org.aussiebox.dfwaypoints.DFWaypoints",
       "org.aussiebox.dfwaypoints.render.WaypointRenderPipeline"
+    ],
+    "modmenu": [
+      "org.aussiebox.dfwaypoints.config.ModMenuIntegration"
     ]
   },
 

@@ -1,5 +1,6 @@
 package org.aussiebox.dfwaypoints.features;
 
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -114,6 +115,11 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
                 )
         ).then(
                 literal("appearance")
+                        .then(literal("render")
+                                .then(argument("boolean", BoolArgumentType.bool())
+                                        .then(waypointEntry
+                                                .executes((context) -> setBooleanSetting(context, StringArgumentType.getString(context, "waypoint"), BooleanSetting.RENDER, context.getArgument("boolean", Boolean.class)))))
+                        )
                         .then(literal("waypoint_color")
                                 .then(argument("color", HexColorArgumentType.hexColor())
                                         .then(waypointEntry
@@ -515,6 +521,41 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
             }
         }
         return 0;
+    }
+
+    public int setBooleanSetting(CommandContext<FabricClientCommandSource> context, String waypointName, BooleanSetting setting, boolean bool) {
+        if (Flint.getUser().getPlot() == null) {
+            MessageSystem.ErrorMessage(
+                    Text.translatable("message.dfwaypoints.error.appearance.not_on_plot"),
+                    true
+            );
+            return 0;
+        }
+
+        Map<WaypointType, Waypoint[]> waypoints = Waypoints.getWaypoints(Flint.getUser().getPlot().getId());
+
+        for (Waypoint[] waypointList : waypoints.values()) {
+            for (Waypoint waypoint : waypointList) {
+                if (Objects.equals(waypoint.getName(), waypointName)) {
+                    if (setting == BooleanSetting.RENDER) {
+                        MessageSystem.SuccessMessage(
+                                Text.translatable("message.dfwaypoints.success.appearance.set_rendering")
+                                        .append(waypoint.getName()).withColor(waypoint.textColor)
+                                        .append(Text.translatable("message.dfwaypoints.success.appearance.set_to")).withColor(0x8CF4E2)
+                                        .append(String.valueOf(bool)).withColor((bool) ? 0xFF55FF55 : 0xFFFF5555)
+                                        .append(Text.translatable("message.dfwaypoints.general.period")),
+                                true
+                        );
+                        waypoint.render = bool;
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
+    public enum BooleanSetting {
+        RENDER
     }
 
     public enum ColorSetting {

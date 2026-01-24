@@ -7,6 +7,7 @@ public class Waypoint {
     private final String name;
     private final WaypointType type;
     private final Vec3d position;
+    public boolean render;
     public int waypointColor;
     public int textColor;
     public int textOutlineColor;
@@ -15,6 +16,7 @@ public class Waypoint {
         this.name = name;
         this.type = type;
         this.position = position;
+        this.render = true;
         this.waypointColor = 0xFF8CF4E2;
         this.textColor = 0xFFFFFFFF;
         this.textOutlineColor = 0xFF000000;
@@ -27,9 +29,10 @@ public class Waypoint {
         double z = json.get("z").getAsDouble();
 
         Waypoint waypoint = new Waypoint(name, type, new Vec3d(x, y, z));
-        waypoint.waypointColor = json.get("waypoint_color").getAsInt();
-        waypoint.textColor = json.get("text_color").getAsInt();
-        waypoint.textOutlineColor = json.get("text_outline_color").getAsInt();
+        waypoint.render = !json.has("render") || json.get("render").getAsBoolean();
+        waypoint.waypointColor = json.has("waypoint_color") ? json.get("waypoint_color").getAsInt() : 0xFF8CF4E2;
+        waypoint.textColor = json.has("text_color") ? json.get("text_color").getAsInt() : 0xFFFFFFFF;
+        waypoint.textOutlineColor = json.has("text_outline_color") ? json.get("text_outline_color").getAsInt() : 0xFF000000;
 
         return waypoint;
     }
@@ -40,6 +43,7 @@ public class Waypoint {
         json.addProperty("x", position.x);
         json.addProperty("y", position.y);
         json.addProperty("z", position.z);
+        json.addProperty("render", render);
         json.addProperty("waypoint_color", waypointColor);
         json.addProperty("text_color", textColor);
         json.addProperty("text_outline_color", textOutlineColor);

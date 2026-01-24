@@ -28,8 +28,29 @@
   "message.dfwaypoints.error.teleport.not_in_editor": "You must be in dev/build mode to teleport to waypoints!",
 
   "message.dfwaypoints.error.appearance.not_on_plot": "You must be on a plot to edit the appearance of waypoints!",
+      "message.dfwaypoints.success.appearance.set_rendering": "Rendering of waypoint ",
       "message.dfwaypoints.success.appearance.set_waypoint_color": "Color of waypoint ",
-      "message.dfwaypoints.success.appearance.set_text_color": "Color of waypoint ",
+      "message.dfwaypoints.success.appearance.set_text_color": "Text Color of waypoint ",
       "message.dfwaypoints.success.appearance.set_text_outline_color": "Text Outline Color of waypoint ",
-  "message.dfwaypoints.success.appearance.set_to": " has been set to "
+  "message.dfwaypoints.success.appearance.set_to": " has been set to ",
+
+  "config.dfwaypoints.alignment.top_left": "Top Left",
+  "config.dfwaypoints.alignment.top_center": "Top Center",
+  "config.dfwaypoints.alignment.top_right": "Top Right",
+  "config.dfwaypoints.alignment.middle_left": "Middle Left",
+  "config.dfwaypoints.alignment.middle_center": "Middle Center",
+  "config.dfwaypoints.alignment.middle_right": "Middle Right",
+  "config.dfwaypoints.alignment.bottom_left": "Bottom Left",
+  "config.dfwaypoints.alignment.bottom_center": "Bottom Center",
+  "config.dfwaypoints.alignment.bottom_right": "Bottom Right",
+
+  "config.dfwaypoints.title": "DFWaypoints Config",
+      "config.dfwaypoints.category.general": "General",
+          "config.dfwaypoints.category.general.tooltip": "General config options that don't fit into other categories.",
+      "config.dfwaypoints.category.rendering": "Rendering",
+          "config.dfwaypoints.category.rendering.tooltip": "Config options related to rendering.",
+          "config.dfwaypoints.rendering.show_lookwarp_tip": "Show Lookwarp Tip",
+              "config.dfwaypoints.rendering.show_lookwarp_tip.desc": "Shows a tip reading \"[Keybind] Warp\" when looking towards a waypoint.",
+          "config.dfwaypoints.rendering.waypoint_hud_alignment": "Waypoint HUD Alignment",
+              "config.dfwaypoints.rendering.waypoint_hud_alignment.desc": "Sets the alignment of waypoint lists shown on the HUD."
 }

@@ -46,7 +46,7 @@ public class MessageSystem {
 
         assert DFWaypoints.MC.player != null;
         DFWaypoints.MC.player.sendMessage(resultMessage, false);
-        if(playSound = true) {
+        if(playSound) {
             DFWaypoints.MC.player.playSound(SoundEvents.ENTITY_EXPERIENCE_ORB_PICKUP);
         }
 
@@ -84,7 +84,7 @@ public class MessageSystem {
 
         assert DFWaypoints.MC.player != null;
         DFWaypoints.MC.player.sendMessage(resultMessage, false);
-        if(playSound = true) {
+        if(playSound) {
             DFWaypoints.MC.player.playSound(SoundEvents.ITEM_TRIDENT_RETURN);
         }
 
@@ -122,7 +122,7 @@ public class MessageSystem {
 
         assert DFWaypoints.MC.player != null;
         DFWaypoints.MC.player.sendMessage(resultMessage, false);
-        if(playSound = true) {
+        if(playSound) {
             DFWaypoints.MC.player.playSound(SoundEvents.ENTITY_SHULKER_HURT_CLOSED);
         }
 
