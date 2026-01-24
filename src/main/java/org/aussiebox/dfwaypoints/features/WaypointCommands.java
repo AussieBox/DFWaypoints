@@ -137,7 +137,7 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
 
         if (Flint.getUser().getPlot() == null) {
             MessageSystem.ErrorMessage(
-                    Text.literal("You must be on a plot to create waypoints!"),
+                    Text.translatable("message.dfwaypoints.error.create.not_on_plot"),
                     true
             );
             return 0;
@@ -149,7 +149,7 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
 
         MutableText hoverText = Text.empty()
                 .append(
-                        Text.literal("Waypoint Name: ")
+                        Text.translatable("hover.dfwaypoints.info.create.name")
                                 .withColor(0xFFFFFF)
                 )
                 .append(
@@ -157,7 +157,7 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
                                 .withColor(0xFFFF55)
                 )
                 .append(
-                        Text.literal("\nPlot: ")
+                        Text.translatable("hover.dfwaypoints.info.create.plot")
                                 .withColor(0xFFFFFF)
                 )
                 .append(
@@ -171,14 +171,14 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
 
         MutableText waypointCreatedMessage = Text.empty()
                 .copy().append(
-                        Text.literal("Waypoint Created. ")
+                        Text.translatable("message.dfwaypoints.success.create.created")
                                 .styled(style -> style.withHoverEvent(
                                             new HoverEvent.ShowText(hoverText)
                                         )
                                 )
                                 .styled(style -> style.withFont(new StyleSpriteSource.Font(Identifier.of("minecraft:default"))))
                 ).append(
-                        Text.literal("(Hover for details)")
+                        Text.translatable("message.dfwaypoints.info.general.hover_for_details")
                                 .withColor(0xAAAAAA)
                                 .styled(style -> style.withHoverEvent(
                                             new HoverEvent.ShowText(hoverText)
@@ -188,7 +188,7 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
 
         MutableText waypointCreatedNotSavedMessage = Text.empty()
                 .copy().append(
-                        Text.literal("DFWaypoints ran into an issue saving waypoint data. Your waypoint has been created, but may not save upon closing the game. ")
+                        Text.translatable("message.dfwaypoints.error.create.could_not_save")
                                 .styled(style -> style.withHoverEvent(
                                             new HoverEvent.ShowText(hoverText)
                                         )
@@ -198,7 +198,7 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
                                 )
                 )
                 .append(
-                        Text.literal("(Hover for details)")
+                        Text.translatable("message.dfwaypoints.info.general.hover_for_details")
                                 .withColor(0xAAAAAA)
                                 .styled(style -> style.withHoverEvent(
                                             new HoverEvent.ShowText(hoverText)
@@ -213,7 +213,7 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
                 if (Objects.equals(waypoint.getName(), text)) {
 
                     MessageSystem.ErrorMessage(
-                            Text.literal("You already have a waypoint with this name!"),
+                            Text.translatable("message.dfwaypoints.error.create.waypoint_already_exists"),
                             true
                     );
 
@@ -480,30 +480,33 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
                 if (Objects.equals(waypoint.getName(), waypointName)) {
                     if (setting == ColorSetting.WAYPOINT_COLOR) {
                         MessageSystem.SuccessMessage(
-                                Text.literal("Color of waypoint ")
+                                Text.translatable("message.dfwaypoints.success.appearance.set_waypoint_color")
                                         .append(waypoint.getName()).withColor(waypoint.textColor)
-                                        .append(" has been set to ").withColor(0x8CF4E2)
-                                        .append(HexFormat.of().withUpperCase().toHexDigits(ColorHelper.withAlpha(0, color), 6)).withColor(color),
+                                        .append(Text.translatable("message.dfwaypoints.success.appearance.set_to")).withColor(0x8CF4E2)
+                                        .append(HexFormat.of().withUpperCase().toHexDigits(ColorHelper.withAlpha(0, color), 6)).withColor(color)
+                                        .append(Text.translatable("message.dfwaypoints.general.period")),
                                 true
                         );
                         waypoint.waypointColor = color;
                     }
                     if (setting == ColorSetting.TEXT_COLOR) {
                         MessageSystem.SuccessMessage(
-                                Text.literal("Text Color of waypoint ")
+                                Text.translatable("message.dfwaypoints.success.appearance.set_text_color")
                                         .append(waypoint.getName()).withColor(waypoint.textColor)
-                                        .append(" has been set to ").withColor(0x8CF4E2)
-                                        .append(HexFormat.of().withUpperCase().toHexDigits(ColorHelper.withAlpha(0, color), 6)).withColor(color),
+                                        .append(Text.translatable("message.dfwaypoints.success.appearance.set_to")).withColor(0x8CF4E2)
+                                        .append(HexFormat.of().withUpperCase().toHexDigits(ColorHelper.withAlpha(0, color), 6)).withColor(color)
+                                        .append(Text.translatable("message.dfwaypoints.general.period")),
                                 true
                         );
                         waypoint.textColor = color;
                     }
                     if (setting == ColorSetting.TEXT_OUTLINE_COLOR) {
                         MessageSystem.SuccessMessage(
-                                Text.literal("Text Outline Color of waypoint ")
+                                Text.translatable("message.dfwaypoints.success.appearance.set_text_outline_color")
                                         .append(waypoint.getName()).withColor(waypoint.textColor)
-                                        .append(" has been set to ").withColor(0x8CF4E2)
-                                        .append(HexFormat.of().withUpperCase().toHexDigits(ColorHelper.withAlpha(0, color), 6)).withColor(color),
+                                        .append(Text.translatable("message.dfwaypoints.success.appearance.set_to")).withColor(0x8CF4E2)
+                                        .append(HexFormat.of().withUpperCase().toHexDigits(ColorHelper.withAlpha(0, color), 6)).withColor(color)
+                                        .append(Text.translatable("message.dfwaypoints.general.period")),
                                 true
                         );
                         waypoint.textOutlineColor = color;

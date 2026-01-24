@@ -3,8 +3,15 @@
   "key.dfwaypoints.warp_to_looking": "Warp To Waypoint In Vision",
 
   "message.dfwaypoints.error.general.waypoint_non_existent": "That waypoint does not exist!",
+  "message.dfwaypoints.info.general.hover_for_details": "(Hover for details)",
+  "message.dfwaypoints.general.period": ".",
 
+  "message.dfwaypoints.success.create.created": "Waypoint created. ",
+      "hover.dfwaypoints.info.create.name": "Waypoint Name: ",
+      "hover.dfwaypoints.info.create.plot": "\nPlot: ",
   "message.dfwaypoints.error.create.not_on_plot": "You must be on a plot to create waypoints!",
+  "message.dfwaypoints.error.create.waypoint_already_exists": "You already have a waypoint with this name!",
+  "message.dfwaypoints.error.create.could_not_save": "DFWaypoints ran into an issue saving waypoint data. Your waypoint has been created, but may not save upon closing the game. ",
 
   "message.dfwaypoints.info.list.waypoint_list.1": "Your waypoints for ",
   "message.dfwaypoints.info.list.waypoint_list.2": "Plot ",
@@ -19,5 +26,9 @@
   "message.dfwaypoints.error.teleport.not_on_plot": "You must be on a plot to teleport to waypoints!",
   "message.dfwaypoints.error.teleport.not_in_editor": "You must be in dev/build mode to teleport to waypoints!",
 
-  "message.dfwaypoints.error.appearance.not_on_plot": "You must be on a plot to edit the appearance of waypoints!"
+  "message.dfwaypoints.error.appearance.not_on_plot": "You must be on a plot to edit the appearance of waypoints!",
+      "message.dfwaypoints.success.appearance.set_waypoint_color": "Color of waypoint ",
+      "message.dfwaypoints.success.appearance.set_text_color": "Color of waypoint ",
+      "message.dfwaypoints.success.appearance.set_text_outline_color": "Text Outline Color of waypoint ",
+  "message.dfwaypoints.success.appearance.set_to": " has been set to "
 }
