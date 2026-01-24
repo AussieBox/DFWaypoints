@@ -39,7 +39,7 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
         if (packet instanceof PlaySoundS2CPacket || packet instanceof PlaySoundFromEntityS2CPacket) {
             if (teleported) {
                 teleported = false;
-                return EventResult.CANCEL;
+                return EventResult.PASS;
             }
         }
         return EventResult.PASS;

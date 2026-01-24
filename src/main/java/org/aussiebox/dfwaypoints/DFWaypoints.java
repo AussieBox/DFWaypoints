@@ -27,6 +27,8 @@ public class DFWaypoints implements ClientModInitializer {
     public static final String MOD_ID = "dfwaypoints";
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
+    public static KeyBinding lookwarp;
+
     @Override
     public void onInitializeClient() {
         FlintAPI.confirmLocationWithLocate();
@@ -63,18 +65,17 @@ public class DFWaypoints implements ClientModInitializer {
     }
 
     public void registerKeybinds() {
-        KeyBinding warpToLookingKeybind;
         final KeyBinding.Category CATEGORY = KeyBinding.Category.create(Identifier.of(DFWaypoints.MOD_ID, "keybinds"));
 
-        warpToLookingKeybind = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.dfwaypoints.warp_to_looking",
-                InputUtil.Type.KEYSYM,
+        lookwarp = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.dfwaypoints.lookwarp",
+                InputUtil.Type.MOUSE,
                 GLFW.GLFW_MOUSE_BUTTON_MIDDLE,
                 CATEGORY
         ));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
-            if (warpToLookingKeybind.wasPressed()) {
+            if (lookwarp.wasPressed()) {
                 if (Waypoints.waypointsLookingAt.isEmpty()) return;
                 Waypoint target = Waypoints.waypointsLookingAt.keySet().stream().toList().getFirst();
                 try {

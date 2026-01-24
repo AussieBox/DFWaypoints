@@ -1,6 +1,7 @@
 {
   "key.category.dfwaypoints.keybinds": "DFWaypoints",
-  "key.dfwaypoints.warp_to_looking": "Warp To Waypoint In Vision",
+  "key.dfwaypoints.lookwarp": "Warp To Waypoint In Vision (Lookwarp)",
+      "tip.dfwaypoints.lookwarp": "[%1$s] Warp",
 
   "message.dfwaypoints.error.general.waypoint_non_existent": "That waypoint does not exist!",
   "message.dfwaypoints.info.general.hover_for_details": "(Hover for details)",
