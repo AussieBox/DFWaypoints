@@ -76,21 +76,21 @@ public class WaypointHudRenderer {
             if (!Waypoints.getWaypointsOfType(Flint.getUser().getPlot().getId(), waypoint.getType()).contains(waypoint))
                 Waypoints.waypointsLookingAt.removeDouble(waypoint);
 
-            context.drawText(textRenderer, name, x+1, textY+1, waypoint.textOutlineColor, false);
-            context.drawText(textRenderer, name, x-1, textY+1, waypoint.textOutlineColor, false);
-            context.drawText(textRenderer, name, x+1, textY-1, waypoint.textOutlineColor, false);
-            context.drawText(textRenderer, name, x-1, textY-1, waypoint.textOutlineColor, false);
-            context.drawText(textRenderer, name, x+1, textY, waypoint.textOutlineColor, false);
-            context.drawText(textRenderer, name, x-1, textY, waypoint.textOutlineColor, false);
-            context.drawText(textRenderer, name, x, textY+1, waypoint.textOutlineColor, false);
-            context.drawText(textRenderer, name, x, textY-1, waypoint.textOutlineColor, false);
+            context.drawText(textRenderer, name, x+1, textY+1, waypoint.textOutlineColor.getRGB(), false);
+            context.drawText(textRenderer, name, x-1, textY+1, waypoint.textOutlineColor.getRGB(), false);
+            context.drawText(textRenderer, name, x+1, textY-1, waypoint.textOutlineColor.getRGB(), false);
+            context.drawText(textRenderer, name, x-1, textY-1, waypoint.textOutlineColor.getRGB(), false);
+            context.drawText(textRenderer, name, x+1, textY, waypoint.textOutlineColor.getRGB(), false);
+            context.drawText(textRenderer, name, x-1, textY, waypoint.textOutlineColor.getRGB(), false);
+            context.drawText(textRenderer, name, x, textY+1, waypoint.textOutlineColor.getRGB(), false);
+            context.drawText(textRenderer, name, x, textY-1, waypoint.textOutlineColor.getRGB(), false);
 
             context.drawText(
                     textRenderer,
                     name,
                     x,
                     textY,
-                    waypoint.textColor,
+                    waypoint.textColor.getRGB(),
                     false
             );
             if (!DFWConfig.waypointHudAlignment.asString().contains("bottom")) textY += 3+textRenderer.fontHeight;

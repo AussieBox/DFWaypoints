@@ -127,7 +127,7 @@ public class WaypointRenderPipeline implements ClientModInitializer {
                     Quaternionf quaternion = cameraRenderState.orientation;
                     matrices.multiply(quaternion, (float) pos.x, (float) pos.y, (float) pos.z);
 
-                    renderWaypointContent(matrices.peek().getPositionMatrix(), buffer, (float) pos.x, (float) pos.y, (float) pos.z, ColorHelper.withAlpha(alpha, waypoint.waypointColor));
+                    renderWaypointContent(matrices.peek().getPositionMatrix(), buffer, (float) pos.x, (float) pos.y, (float) pos.z, ColorHelper.withAlpha(alpha, waypoint.waypointColor.getRGB()));
 
                     matrices.pop();
 
@@ -148,9 +148,9 @@ public class WaypointRenderPipeline implements ClientModInitializer {
                             true,
                             TextRenderer.TextLayerType.SEE_THROUGH,
                             15,
-                            ColorHelper.withAlpha(alpha, waypoint.textColor),
+                            ColorHelper.withAlpha(alpha, waypoint.textColor.getRGB()),
                             0x00000000,
-                            ColorHelper.withAlpha(alpha, waypoint.textOutlineColor)
+                            ColorHelper.withAlpha(alpha, waypoint.textOutlineColor.getRGB())
                     );
 
                     matrices.pop();
@@ -183,7 +183,7 @@ public class WaypointRenderPipeline implements ClientModInitializer {
                 matrices.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z);
 
                 Vec3d pos = waypoint.getPosition();
-                renderWaypointLineContent(matrices.peek().getPositionMatrix(), buffer, (float) pos.x, (float) pos.y, (float) pos.z, ColorHelper.withAlpha(100, waypoint.waypointColor));
+                renderWaypointLineContent(matrices.peek().getPositionMatrix(), buffer, (float) pos.x, (float) pos.y, (float) pos.z, ColorHelper.withAlpha(100, waypoint.waypointColor.getRGB()));
 
                 matrices.pop();
             }

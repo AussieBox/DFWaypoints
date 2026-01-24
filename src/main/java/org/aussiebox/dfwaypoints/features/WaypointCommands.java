@@ -19,14 +19,17 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.Vec3d;
 import org.aussiebox.dfwaypoints.DFWaypoints;
+import org.aussiebox.dfwaypoints.config.DFWConfig;
 import org.aussiebox.dfwaypoints.helpers.MessageSystem;
 import org.aussiebox.dfwaypoints.util.CommandSender;
 import org.aussiebox.dfwaypoints.waypoints.Waypoint;
 import org.aussiebox.dfwaypoints.waypoints.WaypointType;
 import org.aussiebox.dfwaypoints.waypoints.Waypoints;
 
+import java.awt.*;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
@@ -135,6 +138,9 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
                                         .then(waypointEntry
                                                 .executes((context) -> setColorSetting(context, StringArgumentType.getString(context, "waypoint"), ColorSetting.TEXT_OUTLINE_COLOR, context.getArgument("color", Integer.class)))))
                         )
+        ).then(
+                literal("config")
+                        .executes((context) -> DFWConfig.openConfig())
         );
     }
 
@@ -295,7 +301,6 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
         MessageSystem.InfoMessage(waypointListMessage, false);
 
         for (String name : names) {
-
             MutableText listWaypoint = Text.literal(" » ")
                     .withColor(0xFFFFFF)
                     .append(
@@ -487,35 +492,35 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
                     if (setting == ColorSetting.WAYPOINT_COLOR) {
                         MessageSystem.SuccessMessage(
                                 Text.translatable("message.dfwaypoints.success.appearance.set_waypoint_color")
-                                        .append(waypoint.getName()).withColor(waypoint.textColor)
-                                        .append(Text.translatable("message.dfwaypoints.success.appearance.set_to")).withColor(0x8CF4E2)
-                                        .append(HexFormat.of().withUpperCase().toHexDigits(ColorHelper.withAlpha(0, color), 6)).withColor(color)
-                                        .append(Text.translatable("message.dfwaypoints.general.period")),
+                                        .append(Text.literal(waypoint.getName()).withColor(waypoint.textColor.getRGB()))
+                                        .append(Text.translatable("message.dfwaypoints.success.appearance.set_to").withColor(0x8CF4E2))
+                                        .append(Text.literal("#" + HexFormat.of().withUpperCase().toHexDigits(ColorHelper.withAlpha(0, color), 6)).withColor(color))
+                                        .append(Text.translatable("message.dfwaypoints.general.period").withColor(0x8CF4E2)),
                                 true
                         );
-                        waypoint.waypointColor = color;
+                        waypoint.waypointColor = new Color(color);
                     }
                     if (setting == ColorSetting.TEXT_COLOR) {
                         MessageSystem.SuccessMessage(
                                 Text.translatable("message.dfwaypoints.success.appearance.set_text_color")
-                                        .append(waypoint.getName()).withColor(waypoint.textColor)
-                                        .append(Text.translatable("message.dfwaypoints.success.appearance.set_to")).withColor(0x8CF4E2)
-                                        .append(HexFormat.of().withUpperCase().toHexDigits(ColorHelper.withAlpha(0, color), 6)).withColor(color)
-                                        .append(Text.translatable("message.dfwaypoints.general.period")),
+                                        .append(Text.literal(waypoint.getName()).withColor(waypoint.textColor.getRGB()))
+                                        .append(Text.translatable("message.dfwaypoints.success.appearance.set_to").withColor(0x8CF4E2))
+                                        .append(Text.literal("#" + HexFormat.of().withUpperCase().toHexDigits(ColorHelper.withAlpha(0, color), 6)).withColor(color))
+                                        .append(Text.translatable("message.dfwaypoints.general.period").withColor(0x8CF4E2)),
                                 true
                         );
-                        waypoint.textColor = color;
+                        waypoint.textColor = new Color(color);
                     }
                     if (setting == ColorSetting.TEXT_OUTLINE_COLOR) {
                         MessageSystem.SuccessMessage(
                                 Text.translatable("message.dfwaypoints.success.appearance.set_text_outline_color")
-                                        .append(waypoint.getName()).withColor(waypoint.textColor)
-                                        .append(Text.translatable("message.dfwaypoints.success.appearance.set_to")).withColor(0x8CF4E2)
-                                        .append(HexFormat.of().withUpperCase().toHexDigits(ColorHelper.withAlpha(0, color), 6)).withColor(color)
-                                        .append(Text.translatable("message.dfwaypoints.general.period")),
+                                        .append(Text.literal(waypoint.getName()).withColor(waypoint.textColor.getRGB()))
+                                        .append(Text.translatable("message.dfwaypoints.success.appearance.set_to").withColor(0x8CF4E2))
+                                        .append(Text.literal("#" + HexFormat.of().withUpperCase().toHexDigits(ColorHelper.withAlpha(0, color), 6)).withColor(color))
+                                        .append(Text.translatable("message.dfwaypoints.general.period").withColor(0x8CF4E2)),
                                 true
                         );
-                        waypoint.textOutlineColor = color;
+                        waypoint.textOutlineColor = new Color(color);
                     }
                 }
             }
@@ -540,10 +545,10 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
                     if (setting == BooleanSetting.RENDER) {
                         MessageSystem.SuccessMessage(
                                 Text.translatable("message.dfwaypoints.success.appearance.set_rendering")
-                                        .append(waypoint.getName()).withColor(waypoint.textColor)
-                                        .append(Text.translatable("message.dfwaypoints.success.appearance.set_to")).withColor(0x8CF4E2)
-                                        .append(String.valueOf(bool)).withColor((bool) ? 0xFF55FF55 : 0xFFFF5555)
-                                        .append(Text.translatable("message.dfwaypoints.general.period")),
+                                        .append(Text.literal(waypoint.getName()).withColor(waypoint.textColor.getRGB()))
+                                        .append(Text.translatable("message.dfwaypoints.success.appearance.set_to").withColor(0x8CF4E2))
+                                        .append(Text.literal(String.valueOf(bool)).withColor((bool) ? 0xFF55FF55 : 0xFFFF5555))
+                                        .append(Text.translatable("message.dfwaypoints.general.period").withColor(0x8CF4E2)),
                                 true
                         );
                         waypoint.render = bool;

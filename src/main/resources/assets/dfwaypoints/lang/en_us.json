@@ -52,5 +52,16 @@
           "config.dfwaypoints.rendering.show_lookwarp_tip": "Show Lookwarp Tip",
               "config.dfwaypoints.rendering.show_lookwarp_tip.desc": "Shows a tip reading \"[Keybind] Warp\" when looking towards a waypoint.",
           "config.dfwaypoints.rendering.waypoint_hud_alignment": "Waypoint HUD Alignment",
-              "config.dfwaypoints.rendering.waypoint_hud_alignment.desc": "Sets the alignment of waypoint lists shown on the HUD."
+              "config.dfwaypoints.rendering.waypoint_hud_alignment.desc": "Sets the alignment of waypoint lists shown on the HUD.",
+      "config.dfwaypoints.category.waypoints": "Waypoints",
+          "config.dfwaypoints.category.waypoints.tooltip": "Configure your waypoints for this plot.",
+          "config.dfwaypoints.group.waypoints.waypoint": "Waypoints (Normal)",
+              "config.dfwaypoints.waypoints.render_waypoint": "Render Waypoint",
+                  "config.dfwaypoints.waypoints.render_waypoint.desc": "Shows this waypoint in the world and on the HUD if you are looking in its general direction.",
+              "config.dfwaypoints.waypoints.waypoint_color": "Waypoint Color",
+                  "config.dfwaypoints.waypoints.waypoint_color.desc": "The color this waypoint's icon is rendered in.",
+              "config.dfwaypoints.waypoints.text_color": "Text Color",
+                  "config.dfwaypoints.waypoints.text_color.desc": "The color this waypoint's name is rendered in.",
+              "config.dfwaypoints.waypoints.text_outline_color": "Text Outline Color",
+                  "config.dfwaypoints.waypoints.text_outline_color.desc": "The color this waypoint's name outline is rendered in."
 }

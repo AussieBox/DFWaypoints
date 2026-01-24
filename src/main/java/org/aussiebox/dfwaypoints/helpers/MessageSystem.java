@@ -39,7 +39,7 @@ public class MessageSystem {
                         message
                                 .withColor(0x8CF4E2)
                                 .styled(
-                                        style -> style.withFont(new StyleSpriteSource.Font(Identifier.of("minecraft:default")))
+                                        style -> message.getStyle().withFont(new StyleSpriteSource.Font(Identifier.of("minecraft:default")))
                                 )
                 );
 
@@ -77,7 +77,7 @@ public class MessageSystem {
                         message
                                 .withColor(0xABE5FF)
                                 .styled(
-                                        style -> style.withFont(new StyleSpriteSource.Font(Identifier.of("minecraft:default")))
+                                        style -> message.getStyle().withFont(new StyleSpriteSource.Font(Identifier.of("minecraft:default")))
                                 )
                 );
 
@@ -115,7 +115,7 @@ public class MessageSystem {
                         message
                                 .withColor(0xFF6868)
                                 .styled(
-                                        style -> style.withFont(new StyleSpriteSource.Font(Identifier.of("minecraft:default")))
+                                        style -> message.getStyle().withFont(new StyleSpriteSource.Font(Identifier.of("minecraft:default")))
                                 )
                 );
 
