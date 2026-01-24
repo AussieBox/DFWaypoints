@@ -1,6 +1,6 @@
 package org.aussiebox.dfwaypoints.util;
 
-import org.aussiebox.dfwaypoints.Dfwaypoints;
+import org.aussiebox.dfwaypoints.DFWaypoints;
 import org.aussiebox.dfwaypoints.helpers.RateLimiter;
 
 import java.util.ArrayDeque;
@@ -29,9 +29,9 @@ public class CommandSender {
 
     public static void tick() {
         rateLimiter.tick();
-        if (Dfwaypoints.MC.getNetworkHandler() == null) return;
+        if (DFWaypoints.MC.getNetworkHandler() == null) return;
         if (!rateLimiter.isRateLimited() && !commandQueue.isEmpty()) {
-            Dfwaypoints.MC.getNetworkHandler().sendChatCommand(commandQueue.pop());
+            DFWaypoints.MC.getNetworkHandler().sendChatCommand(commandQueue.pop());
             // No need to increment here, since our packet listener will do that for us. (Event#onSendPacket)
         }
     }

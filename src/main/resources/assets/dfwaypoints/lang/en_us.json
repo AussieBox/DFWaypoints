@@ -1,0 +1,23 @@
+{
+  "key.category.dfwaypoints.keybinds": "DFWaypoints",
+  "key.dfwaypoints.warp_to_looking": "Warp To Waypoint In Vision",
+
+  "message.dfwaypoints.error.general.waypoint_non_existent": "That waypoint does not exist!",
+
+  "message.dfwaypoints.error.create.not_on_plot": "You must be on a plot to create waypoints!",
+
+  "message.dfwaypoints.info.list.waypoint_list.1": "Your waypoints for ",
+  "message.dfwaypoints.info.list.waypoint_list.2": "Plot ",
+      "hover.dfwaypoints.info.list.teleport": "Teleport to waypoint",
+      "hover.dfwaypoints.info.list.delete": "Delete waypoint",
+  "message.dfwaypoints.error.list.not_on_plot": "You must be on a plot to list your waypoints!",
+
+  "message.dfwaypoints.success.delete.deleted": "Waypoint Deleted. ",
+  "message.dfwaypoints.error.delete.not_on_plot": "You must be on a plot to delete waypoints!",
+  "message.dfwaypoints.error.delete.could_not_save": "DFWaypoints ran into an issue saving waypoint data. Your waypoint has been deleted, but may not save upon closing the game.",
+
+  "message.dfwaypoints.error.teleport.not_on_plot": "You must be on a plot to teleport to waypoints!",
+  "message.dfwaypoints.error.teleport.not_in_editor": "You must be in dev/build mode to teleport to waypoints!",
+
+  "message.dfwaypoints.error.appearance.not_on_plot": "You must be on a plot to edit the appearance of waypoints!"
+}

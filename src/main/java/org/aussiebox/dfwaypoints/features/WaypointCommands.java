@@ -9,25 +9,23 @@ import dev.dfonline.flint.feature.trait.PacketListeningFeature;
 import dev.dfonline.flint.util.result.EventResult;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.minecraft.command.CommandRegistryAccess;
+import net.minecraft.command.argument.HexColorArgumentType;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.PlaySoundFromEntityS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlaySoundS2CPacket;
-import net.minecraft.text.ClickEvent;
-import net.minecraft.text.HoverEvent;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+import net.minecraft.text.*;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.math.ColorHelper;
 import net.minecraft.util.math.Vec3d;
-import org.aussiebox.dfwaypoints.Dfwaypoints;
+import org.aussiebox.dfwaypoints.DFWaypoints;
 import org.aussiebox.dfwaypoints.helpers.MessageSystem;
 import org.aussiebox.dfwaypoints.util.CommandSender;
 import org.aussiebox.dfwaypoints.waypoints.Waypoint;
+import org.aussiebox.dfwaypoints.waypoints.WaypointType;
 import org.aussiebox.dfwaypoints.waypoints.Waypoints;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.argument;
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
@@ -59,128 +57,88 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
 
     @Override
     public LiteralArgumentBuilder<FabricClientCommandSource> createCommand(LiteralArgumentBuilder<FabricClientCommandSource> builder, CommandRegistryAccess commandRegistryAccess) {
+        var waypointEntry = argument("waypoint", StringArgumentType.greedyString())
+                .suggests((context, suggestionsBuilder) -> {
+                    if (Flint.getUser().getPlot() == null) {
+                        return suggestionsBuilder.buildFuture();
+                    }
+
+                    List<String> names = new ArrayList<>();
+                    Map<WaypointType, Waypoint[]> waypoints = Waypoints.getWaypoints(Flint.getUser().getPlot().getId());
+                    for (Waypoint[] waypointList : waypoints.values()) {
+                        for (Waypoint waypoint : waypointList) {
+                            names.add(waypoint.getName());
+                        }
+                    }
+
+                    for (String name : names.stream().filter(name -> name.startsWith(suggestionsBuilder.getRemaining())).sorted().toList()) {
+                        suggestionsBuilder.suggest(name);
+                    }
+                    return suggestionsBuilder.buildFuture();
+                });
+
         return builder.then(
                 literal("create").then(
-                        argument("text", StringArgumentType.greedyString()).executes(context -> createWaypoint(context, StringArgumentType.getString(context, "text")))
+                        argument("waypoint", StringArgumentType.greedyString())
+                                .executes(context -> createWaypoint(context, StringArgumentType.getString(context, "waypoint")))
                 )
         ).then(
                 literal("list").executes(this::listWaypoints)
         ).then(
-                literal("teleport").then(
-                        argument("text", StringArgumentType.greedyString())
-                                .suggests((context, suggestionsBuilder) -> {
-                                    if (Flint.getUser().getPlot() == null) {
-                                        return suggestionsBuilder.buildFuture();
-                                    }
-                                    List<Waypoint> waypoints = Waypoints.getWaypoints(Flint.getUser().getPlot().getId());
-                                    List<String> names = waypoints
-                                            .stream()
-                                            .map(Waypoint::getName)
-                                            .filter(name -> name.startsWith(suggestionsBuilder.getRemaining()))
-                                            .sorted()
-                                            .toList();
-
-                                    for (String name : names) {
-                                        suggestionsBuilder.suggest(name);
-                                    }
-                                    return suggestionsBuilder.buildFuture();
-                                })
-                                .executes(context -> {
-                                    try {
-                                        return teleportToWaypoint(context, StringArgumentType.getString(context, "text"));
-                                    } catch (InterruptedException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                })
+                literal("teleport").then(waypointEntry
+                        .executes(context -> {
+                            try {
+                                return teleportToWaypoint(StringArgumentType.getString(context, "waypoint"));
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
                 )
         ).then(
-                literal("tp").then(
-                        argument("text", StringArgumentType.greedyString())
-                                .suggests((context, suggestionsBuilder) -> {
-                                    if (Flint.getUser().getPlot() == null) {
-                                        return suggestionsBuilder.buildFuture();
-                                    }
-                                    List<Waypoint> waypoints = Waypoints.getWaypoints(Flint.getUser().getPlot().getId());
-                                    List<String> names = waypoints
-                                            .stream()
-                                            .map(Waypoint::getName)
-                                            .filter(name -> name.startsWith(suggestionsBuilder.getRemaining()))
-                                            .sorted()
-                                            .toList();
-
-                                    for (String name : names) {
-                                        suggestionsBuilder.suggest(name);
-                                    }
-                                    return suggestionsBuilder.buildFuture();
-                                })
-                                .executes(context -> {
-                                    try {
-                                        return teleportToWaypoint(context, StringArgumentType.getString(context, "text"));
-                                    } catch (InterruptedException e) {
-                                        throw new RuntimeException(e);
-                                    }
-                                })
+                literal("tp").then(waypointEntry
+                        .executes(context -> {
+                            try {
+                                return teleportToWaypoint(StringArgumentType.getString(context, "waypoint"));
+                            } catch (InterruptedException e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
                 )
         ).then(
-                literal("delete").then(
-                        argument("text", StringArgumentType.greedyString())
-                                .suggests((context, suggestionsBuilder) -> {
-                                    if (Flint.getUser().getPlot() == null) {
-                                        return suggestionsBuilder.buildFuture();
-                                    }
-                                    List<Waypoint> waypoints = Waypoints.getWaypoints(Flint.getUser().getPlot().getId());
-                                    List<String> names = waypoints
-                                            .stream()
-                                            .map(Waypoint::getName)
-                                            .filter(name -> name.startsWith(suggestionsBuilder.getRemaining()))
-                                            .sorted()
-                                            .toList();
-
-                                    for (String name : names) {
-                                        suggestionsBuilder.suggest(name);
-                                    }
-                                    return suggestionsBuilder.buildFuture();
-                                })
-                                .executes(context -> deleteWaypoint(context, StringArgumentType.getString(context, "text")))
+                literal("delete").then(waypointEntry
+                        .executes(context -> deleteWaypoint(context, StringArgumentType.getString(context, "waypoint")))
                 )
         ).then(
-                literal("remove").then(
-                        argument("text", StringArgumentType.greedyString())
-                                .suggests((context, suggestionsBuilder) -> {
-                                    if (Flint.getUser().getPlot() == null) {
-                                        return suggestionsBuilder.buildFuture();
-                                    }
-                                    List<Waypoint> waypoints = Waypoints.getWaypoints(Flint.getUser().getPlot().getId());
-                                    List<String> names = waypoints
-                                            .stream()
-                                            .map(Waypoint::getName)
-                                            .filter(name -> name.startsWith(suggestionsBuilder.getRemaining()))
-                                            .sorted()
-                                            .toList();
-
-                                    for (String name : names) {
-                                        suggestionsBuilder.suggest(name);
-                                    }
-                                    return suggestionsBuilder.buildFuture();
-                                })
-                                .executes(context -> deleteWaypoint(context, StringArgumentType.getString(context, "text")))
+                literal("remove").then(waypointEntry
+                        .executes(context -> deleteWaypoint(context, StringArgumentType.getString(context, "waypoint")))
                 )
+        ).then(
+                literal("appearance")
+                        .then(literal("waypoint_color")
+                                .then(argument("color", HexColorArgumentType.hexColor())
+                                        .then(waypointEntry
+                                                .executes((context) -> setColorSetting(context, StringArgumentType.getString(context, "waypoint"), ColorSetting.WAYPOINT_COLOR, context.getArgument("color", Integer.class)))))
+                        )
+                        .then(literal("text_color")
+                                .then(argument("color", HexColorArgumentType.hexColor())
+                                        .then(waypointEntry
+                                                .executes((context) -> setColorSetting(context, StringArgumentType.getString(context, "waypoint"), ColorSetting.TEXT_COLOR, context.getArgument("color", Integer.class)))))
+                        )
+                        .then(literal("text_outline_color")
+                                .then(argument("color", HexColorArgumentType.hexColor())
+                                        .then(waypointEntry
+                                                .executes((context) -> setColorSetting(context, StringArgumentType.getString(context, "waypoint"), ColorSetting.TEXT_OUTLINE_COLOR, context.getArgument("color", Integer.class)))))
+                        )
         );
     }
 
     public int createWaypoint(CommandContext<FabricClientCommandSource> context, String text) {
-        assert Dfwaypoints.MC.player != null;
+        assert DFWaypoints.MC.player != null;
 
         if (Flint.getUser().getPlot() == null) {
             MessageSystem.ErrorMessage(
-                    Text.literal("You must be on a plot to create waypoints!")
-            );
-            return 0;
-        }
-
-        if (!Flint.getUser().getMode().isEditor()) {
-            MessageSystem.ErrorMessage(
-                    Text.literal("You must be in dev/build mode to create waypoints!")
+                    Text.literal("You must be on a plot to create waypoints!"),
+                    true
             );
             return 0;
         }
@@ -218,7 +176,7 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
                                             new HoverEvent.ShowText(hoverText)
                                         )
                                 )
-                                .styled(style -> style.withFont(Identifier.of("minecraft:default")))
+                                .styled(style -> style.withFont(new StyleSpriteSource.Font(Identifier.of("minecraft:default"))))
                 ).append(
                         Text.literal("(Hover for details)")
                                 .withColor(0xAAAAAA)
@@ -231,13 +189,12 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
         MutableText waypointCreatedNotSavedMessage = Text.empty()
                 .copy().append(
                         Text.literal("DFWaypoints ran into an issue saving waypoint data. Your waypoint has been created, but may not save upon closing the game. ")
-                                .withColor(0xFFFFFF)
                                 .styled(style -> style.withHoverEvent(
                                             new HoverEvent.ShowText(hoverText)
                                         )
                                 )
                                 .styled(
-                                        style -> style.withFont(Identifier.of("minecraft:default"))
+                                        style -> style.withFont(new StyleSpriteSource.Font(Identifier.of("minecraft:default")))
                                 )
                 )
                 .append(
@@ -249,49 +206,53 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
                                 )
                 );
 
-        List<Waypoint> waypoints = Waypoints.getWaypoints(Flint.getUser().getPlot().getId());
+        Map<WaypointType, Waypoint[]> waypoints = Waypoints.getWaypoints(Flint.getUser().getPlot().getId());
 
-        for (Waypoint waypoint : waypoints) {
-            if (Objects.equals(waypoint.getName(), text)) {
+        for (Waypoint[] waypointList : waypoints.values()) {
+            for (Waypoint waypoint : waypointList) {
+                if (Objects.equals(waypoint.getName(), text)) {
 
-                MessageSystem.ErrorMessage(
-                        Text.literal("You already have a waypoint with this name!")
-                );
+                    MessageSystem.ErrorMessage(
+                            Text.literal("You already have a waypoint with this name!"),
+                            true
+                    );
 
-                return 0;
+                    return 0;
 
+                }
             }
         }
 
-        if (Dfwaypoints.MC.player != null) {
-            Waypoints.addWaypoint(Flint.getUser().getPlot().getId(), new Waypoint(text, Dfwaypoints.MC.player.getPos()));
+        if (DFWaypoints.MC.player != null) {
+            Waypoints.addWaypoint(Flint.getUser().getPlot().getId(), WaypointType.WAYPOINT, new Waypoint(text, WaypointType.WAYPOINT, DFWaypoints.MC.player.getEntityPos()));
+            Waypoints.nodes.put(Flint.getUser().getPlot().getId(), Flint.getUser().getNode());
             try {
                 Waypoints.save();
-                MessageSystem.SuccessMessage(waypointCreatedMessage);
+                MessageSystem.SuccessMessage(waypointCreatedMessage, true);
             } catch (IOException e) {
-                MessageSystem.ErrorMessage(waypointCreatedNotSavedMessage);
+                MessageSystem.ErrorMessage(waypointCreatedNotSavedMessage, true);
             }
         }
-
         return 0;
     }
 
     public int listWaypoints(CommandContext<FabricClientCommandSource> context) {
-        assert Dfwaypoints.MC.player != null;
+        assert DFWaypoints.MC.player != null;
 
         if (Flint.getUser().getPlot() == null) {
             MessageSystem.ErrorMessage(
-                    Text.literal("You must be on a plot to list your waypoints!")
+                    Text.translatable("message.dfwaypoints.error.list.not_on_plot"),
+                    true
             );
             return 0;
         }
 
         MutableText teleportHover = Text.empty()
                 .append(
-                        Text.literal("Teleport to waypoint")
+                        Text.translatable("hover.dfwaypoints.info.list.teleport")
                                 .withColor(0xFFFFFF)
                                 .styled(
-                                        style -> style.withFont(Identifier.of("minecraft:default"))
+                                        style -> style.withFont(new StyleSpriteSource.Font(Identifier.of("minecraft:default")))
                                 )
                                 .styled(
                                         style -> style.withHoverEvent(null)
@@ -300,15 +261,15 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
 
         MutableText deleteHover = Text.empty()
                 .append(
-                        Text.literal("Delete Waypoint")
+                        Text.translatable("hover.dfwaypoints.info.list.delete")
                                 .withColor(0xFFFFFF)
                 );
 
         MutableText waypointListMessage = Text.empty()
                 .copy().append(
-                        Text.literal("Your waypoints for ")
+                        Text.translatable("message.dfwaypoints.info.list.waypoint_list.1")
                 ).append(
-                        Text.literal("Plot ")
+                        Text.translatable("message.dfwaypoints.info.list.waypoint_list.2")
                                 .withColor(0x55FFFF)
                 ).append(
                         Text.literal(String.valueOf(Flint.getUser().getPlot().getId()))
@@ -317,14 +278,15 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
                         Text.literal(":")
                 );
 
-        List<Waypoint> waypoints = Waypoints.getWaypoints(Flint.getUser().getPlot().getId());
-        List<String> names = waypoints
-                .stream()
-                .map(Waypoint::getName)
-                .sorted()
-                .toList();
+        Map<WaypointType, Waypoint[]> waypoints = Waypoints.getWaypoints(Flint.getUser().getPlot().getId());
+        List<String> names = new ArrayList<>();
+        for (Waypoint[] waypointList : waypoints.values()) {
+            for (Waypoint waypoint : waypointList) {
+                names.add(waypoint.getName());
+            }
+        }
 
-        MessageSystem.InfoMessage(waypointListMessage);
+        MessageSystem.InfoMessage(waypointListMessage, false);
 
         for (String name : names) {
 
@@ -410,90 +372,151 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
                                             )
                                     )
                     );
-
-
-            Dfwaypoints.MC.player.sendMessage(listWaypoint, false);
+            DFWaypoints.MC.player.sendMessage(listWaypoint, false);
         }
         return 0;
     }
 
-    public static int teleportToWaypoint(CommandContext<FabricClientCommandSource> context, String text) throws InterruptedException {
+    public static int teleportToWaypoint(String text) throws InterruptedException {
         assert Flint.getClient().player != null;
-        assert Dfwaypoints.MC.player != null;
+        assert DFWaypoints.MC.player != null;
 
         if (Flint.getUser().getPlot() == null) {
             MessageSystem.ErrorMessage(
-                    Text.literal("You must be on a plot to teleport to waypoints!")
+                    Text.translatable("message.dfwaypoints.error.teleport.not_on_plot"),
+                    true
             );
             return 0;
         }
 
         if (!Flint.getUser().getMode().isEditor()) {
             MessageSystem.ErrorMessage(
-                    Text.literal("You must be in dev/build mode to teleport to waypoints!")
+                    Text.translatable("message.dfwaypoints.error.teleport.not_in_editor"),
+                    true
             );
             return 0;
         }
 
-        List<Waypoint> waypoints = Waypoints.getWaypoints(Flint.getUser().getPlot().getId());
+        Map<WaypointType, Waypoint[]> waypoints = Waypoints.getWaypoints(Flint.getUser().getPlot().getId());
 
-        for (Waypoint waypoint : waypoints) {
-            if (Objects.equals(waypoint.getName(), text)) {
+        for (Waypoint[] waypointList : waypoints.values()) {
+            for (Waypoint waypoint : waypointList) {
+                if (Objects.equals(waypoint.getName(), text)) {
 
-                Vec3d position = waypoint.getPosition();
+                    Vec3d position = waypoint.getPosition();
 
-                teleported = true;
-                CommandSender.queue("ptp " + position.x + " " + position.y + " " + position.z);
+                    teleported = true;
+                    CommandSender.queue("ptp " + position.x + " " + position.y + " " + position.z);
 
-                return 0;
-
+                    return 0;
+                }
             }
         }
 
         MessageSystem.ErrorMessage(
-                Text.literal("That waypoint does not exist!")
+                Text.translatable("message.dfwaypoints.error.general.waypoint_non_existent"),
+                true
         );
 
         return 0;
     }
 
     public int deleteWaypoint(CommandContext<FabricClientCommandSource> context, String text) {
-        assert Dfwaypoints.MC.player != null;
+        assert DFWaypoints.MC.player != null;
 
         if (Flint.getUser().getPlot() == null) {
             MessageSystem.ErrorMessage(
-                    Text.literal("You must be on a plot to delete waypoints!")
+                    Text.translatable("message.dfwaypoints.error.delete.not_on_plot"),
+                    true
             );
             return 0;
         }
 
-        List<Waypoint> waypoints = Waypoints.getWaypoints(Flint.getUser().getPlot().getId());
+        Map<WaypointType, Waypoint[]> waypoints = Waypoints.getWaypoints(Flint.getUser().getPlot().getId());
 
-        for (Waypoint waypoint : waypoints) {
-            if (Objects.equals(waypoint.getName(), text)) {
+        for (Waypoint[] waypointList : waypoints.values()) {
+            for (Waypoint waypoint : waypointList) {
+                if (Objects.equals(waypoint.getName(), text)) {
 
-                Waypoints.removeWaypoint(Flint.getUser().getPlot().getId(), waypoint);
-                try {
-                    Waypoints.save();
-                    MessageSystem.SuccessMessage(
-                            Text.literal("Waypoint Deleted. ")
-                    );
-                } catch (IOException e) {
-                    MessageSystem.ErrorMessage(
-                            Text.literal("DFWaypoints ran into an issue saving waypoint data. Your waypoint has been deleted, but may not save upon closing the game.")
-                    );
+                    Waypoints.removeWaypoint(Flint.getUser().getPlot().getId(), WaypointType.WAYPOINT, waypoint);
+                    try {
+                        Waypoints.save();
+                        MessageSystem.SuccessMessage(
+                                Text.translatable("message.dfwaypoints.success.delete.deleted"),
+                                true
+                        );
+                    } catch (IOException e) {
+                        MessageSystem.ErrorMessage(
+                                Text.translatable("message.dfwaypoints.error.delete.could_not_save"),
+                                true
+                        );
+                    }
+                    return 0;
                 }
 
-                return 0;
             }
-
         }
 
         MessageSystem.ErrorMessage(
-                Text.literal("That waypoint does not exist!")
+                Text.translatable("message.dfwaypoints.error.general.waypoint_non_existent"),
+                true
         );
-
         return 0;
+    }
 
+    public int setColorSetting(CommandContext<FabricClientCommandSource> context, String waypointName, ColorSetting setting, int color) {
+        if (Flint.getUser().getPlot() == null) {
+            MessageSystem.ErrorMessage(
+                    Text.translatable("message.dfwaypoints.error.appearance.not_on_plot"),
+                    true
+            );
+            return 0;
+        }
+
+        Map<WaypointType, Waypoint[]> waypoints = Waypoints.getWaypoints(Flint.getUser().getPlot().getId());
+
+        for (Waypoint[] waypointList : waypoints.values()) {
+            for (Waypoint waypoint : waypointList) {
+                if (Objects.equals(waypoint.getName(), waypointName)) {
+                    if (setting == ColorSetting.WAYPOINT_COLOR) {
+                        MessageSystem.SuccessMessage(
+                                Text.literal("Color of waypoint ")
+                                        .append(waypoint.getName()).withColor(waypoint.textColor)
+                                        .append(" has been set to ").withColor(0x8CF4E2)
+                                        .append(HexFormat.of().withUpperCase().toHexDigits(ColorHelper.withAlpha(0, color), 6)).withColor(color),
+                                true
+                        );
+                        waypoint.waypointColor = color;
+                    }
+                    if (setting == ColorSetting.TEXT_COLOR) {
+                        MessageSystem.SuccessMessage(
+                                Text.literal("Text Color of waypoint ")
+                                        .append(waypoint.getName()).withColor(waypoint.textColor)
+                                        .append(" has been set to ").withColor(0x8CF4E2)
+                                        .append(HexFormat.of().withUpperCase().toHexDigits(ColorHelper.withAlpha(0, color), 6)).withColor(color),
+                                true
+                        );
+                        waypoint.textColor = color;
+                    }
+                    if (setting == ColorSetting.TEXT_OUTLINE_COLOR) {
+                        MessageSystem.SuccessMessage(
+                                Text.literal("Text Outline Color of waypoint ")
+                                        .append(waypoint.getName()).withColor(waypoint.textColor)
+                                        .append(" has been set to ").withColor(0x8CF4E2)
+                                        .append(HexFormat.of().withUpperCase().toHexDigits(ColorHelper.withAlpha(0, color), 6)).withColor(color),
+                                true
+                        );
+                        waypoint.textOutlineColor = color;
+                    }
+                }
+            }
+        }
+        return 0;
+    }
+
+    public enum ColorSetting {
+        WAYPOINT_COLOR,
+        TEXT_COLOR,
+        TEXT_OUTLINE_COLOR
     }
 }

@@ -3,49 +3,101 @@ package org.aussiebox.dfwaypoints.waypoints;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import dev.dfonline.flint.hypercube.Node;
+import it.unimi.dsi.fastutil.objects.Object2DoubleLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2DoubleMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectLinkedOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import org.aussiebox.dfwaypoints.DFWaypoints;
 import org.aussiebox.dfwaypoints.util.FileUtil;
 
 import java.io.IOException;
 import java.util.*;
 
 public class Waypoints {
-    private static final Map<Integer, List<Waypoint>> waypoints = new HashMap<>();
+    public static final Object2DoubleMap<Waypoint> waypointsLookingAt = new Object2DoubleLinkedOpenHashMap<>();
+    public static final Object2ObjectMap<Integer, Node> nodes = new Object2ObjectLinkedOpenHashMap<>();
+    private static final Object2ObjectMap<Integer, Object2ObjectMap<WaypointType, Waypoint[]>> waypoints = new Object2ObjectLinkedOpenHashMap<>();
 
     public static void init() {
-        JsonObject json = FileUtil.loadJSON("waypoints.json");
-        for (String plotID : json.keySet()) {
-            Integer id = Integer.parseInt(plotID);
-            JsonArray waypoints = json.getAsJsonArray(plotID);
-            List<Waypoint> waypointList = new ArrayList<>();
-            for (JsonElement waypoint : waypoints) {
-                JsonObject waypointObject = waypoint.getAsJsonObject();
-                waypointList.add(Waypoint.fromJson(waypointObject));
+        JsonObject json = FileUtil.loadJSON("plots.json", null);
+        if (json.getAsJsonArray("plots") == null) return;
+        for (JsonElement plotElement : json.getAsJsonArray("plots")) {
+            Integer id = plotElement.getAsJsonObject().get("id").getAsInt();
+            Node node = Node.fromId(plotElement.getAsJsonObject().get("node").getAsString());
+            Object2ObjectMap<WaypointType, Waypoint[]> plotData = new Object2ObjectLinkedOpenHashMap<>();
+
+            JsonObject plotJson = FileUtil.loadJSON(id + "-waypoints.json", node);
+            for (String type : plotJson.keySet()) {
+                JsonArray array = plotJson.getAsJsonArray(type);
+                List<Waypoint> waypointList = new ArrayList<>();
+                for (JsonElement waypoint : array) {
+                    JsonObject waypointObject = waypoint.getAsJsonObject();
+                    waypointList.add(Waypoint.fromJson(waypointObject, WaypointType.fromId(type)));
+                }
+                plotData.put(WaypointType.fromId(type), waypointList.toArray(new Waypoint[]{}));
             }
-            Waypoints.waypoints.put(id, waypointList);
+            waypoints.put(id, plotData);
+            nodes.put(id, node);
         }
     }
 
     public static void save() throws IOException {
-        JsonObject toSave = new JsonObject();
-        for (Map.Entry<Integer, List<Waypoint>> entry : waypoints.entrySet()) {
-            JsonArray waypoints = new JsonArray();
-            for (Waypoint waypoint : entry.getValue()) {
-                waypoints.add(waypoint.toJson());
+        JsonObject plotJson = new JsonObject();
+        JsonArray plotArray = new JsonArray();
+
+        for (Map.Entry<Integer, Object2ObjectMap<WaypointType, Waypoint[]>> entry : waypoints.entrySet()) {
+            JsonObject toSave = new JsonObject();
+            JsonArray typeArray = new JsonArray();
+            boolean wipe = true;
+            for (WaypointType type : entry.getValue().keySet()) {
+                Waypoint[] typeWaypoints = entry.getValue().get(type);
+                if (!Arrays.stream(typeWaypoints).toList().isEmpty()) wipe = false;
+                for (Waypoint waypoint : typeWaypoints) {
+                    typeArray.add(waypoint.toJson());
+                }
+                toSave.add(type.asString(), typeArray);
             }
-            toSave.add(entry.getKey().toString(), waypoints);
+            if (!wipe) {
+                JsonObject plotObject = new JsonObject();
+                plotObject.addProperty("id", entry.getKey());
+                plotObject.addProperty("node", nodes.getOrDefault(entry.getKey(), Node.LOCAL).getId());
+                plotArray.add(plotObject);
+                FileUtil.saveJSON(entry.getKey() + "-waypoints.json", nodes.getOrDefault(entry.getKey(), Node.LOCAL), toSave);
+            } else {
+                DFWaypoints.LOGGER.info("No Waypoints found for plot {}, removing...", entry.getKey());
+                FileUtil.deleteJSON(entry.getKey() + "-waypoints.json", nodes.remove(entry.getKey()));
+            }
         }
-        FileUtil.saveJSON("waypoints.json", toSave);
+        plotJson.add("plots", plotArray);
+        FileUtil.saveJSON("plots.json", null, plotJson);
     }
 
-    public static List<Waypoint> getWaypoints(Integer id) {
-        return Collections.unmodifiableList(waypoints.computeIfAbsent(id, k -> new ArrayList<>()));
+    public static Map<WaypointType, Waypoint[]> getWaypoints(Integer id) {
+        return Collections.unmodifiableMap(waypoints.computeIfAbsent(id, k -> new Object2ObjectLinkedOpenHashMap<>()));
     }
 
-    public static void addWaypoint(Integer id, Waypoint waypoint) {
-        waypoints.computeIfAbsent(id, k -> new ArrayList<>()).add(waypoint);
+    public static List<Waypoint> getWaypointsOfType(Integer id, WaypointType type) {
+        Object2ObjectMap<WaypointType, Waypoint[]> map = waypoints.computeIfAbsent(id, k -> waypoints.put(id, new Object2ObjectLinkedOpenHashMap<>()));
+        if (map == null) map = new Object2ObjectLinkedOpenHashMap<>();
+        return List.of(map.computeIfAbsent(type, k -> new Waypoint[]{}));
     }
 
-    public static void removeWaypoint(Integer id, Waypoint waypoint) {
-        waypoints.computeIfAbsent(id, k -> new ArrayList<>()).remove(waypoint);
+    public static void setWaypointsOfType(Integer id, WaypointType type, List<Waypoint> waypointArray) {
+        Object2ObjectMap<WaypointType, Waypoint[]> map = waypoints.computeIfAbsent(id, k -> waypoints.put(id, new Object2ObjectLinkedOpenHashMap<>()));
+        if (map == null) map = new Object2ObjectLinkedOpenHashMap<>();
+        map.put(type, waypointArray.toArray(new Waypoint[]{}));
+    }
+
+    public static void addWaypoint(Integer id, WaypointType type, Waypoint waypoint) {
+        List<Waypoint> list = new ArrayList<>(getWaypointsOfType(id, type));
+        list.add(waypoint);
+        setWaypointsOfType(id, type, list);
+    }
+
+    public static void removeWaypoint(Integer id, WaypointType type, Waypoint waypoint) {
+        List<Waypoint> list = new ArrayList<>(getWaypointsOfType(id, type));
+        list.remove(waypoint);
+        setWaypointsOfType(id, type, list);
     }
 }

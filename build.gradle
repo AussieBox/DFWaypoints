@@ -1,5 +1,5 @@
 plugins {
-    id 'fabric-loom' version '1.11-SNAPSHOT'
+    id 'fabric-loom' version '1.14-SNAPSHOT'
     id 'maven-publish'
 }
 
@@ -24,6 +24,14 @@ repositories {
             includeGroup "maven.modrinth"
         }
     }
+    maven {
+        name 'Xander Maven'
+        url 'https://maven.isxander.dev/releases'
+    }
+    maven {
+        name = "DevAuth"
+        url = "https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1"
+    }
 }
 
 dependencies {
@@ -35,12 +43,17 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     // Flint
-    modApi("maven.modrinth:flint:${project.flint_version}")
+    modApi "maven.modrinth:flint:${project.flint_version}"
 
     // Adventure
-    modImplementation include("net.kyori:adventure-platform-fabric:${project.adventure_fabric_version}") {
+    modImplementation include ("net.kyori:adventure-platform-fabric:${project.adventure_fabric_version}") {
         exclude group: "net.fabricmc.fabric-api"
     }
+
+    // DevAuth
+    modRuntimeOnly "me.djtheredstoner:DevAuth-${project.devauth_module}:${project.devauth_version}"
+    // Sodium
+    modRuntimeOnly "maven.modrinth:sodium:${project.sodium_version}"
 }
 
 processResources {
