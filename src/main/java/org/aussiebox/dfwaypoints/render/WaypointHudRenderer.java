@@ -15,6 +15,8 @@ import org.aussiebox.dfwaypoints.waypoints.Waypoints;
 public class WaypointHudRenderer {
 
     public static void render(DrawContext context, RenderTickCounter tickCounter) {
+        if (!DFWConfig.showWaypointHud) return;
+
         TextRenderer textRenderer = MinecraftClient.getInstance().textRenderer;
         int width = MinecraftClient.getInstance().getWindow().getScaledWidth();
         int height = MinecraftClient.getInstance().getWindow().getScaledHeight();

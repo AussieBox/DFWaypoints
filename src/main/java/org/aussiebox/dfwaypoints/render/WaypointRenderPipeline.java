@@ -82,10 +82,14 @@ public class WaypointRenderPipeline implements ClientModInitializer {
     }
 
     public static void extractAndDrawWaypoint(WorldRenderContext context) {
-        renderWaypoint(context);
-        drawWaypoint(MinecraftClient.getInstance(), WAYPOINT);
-        renderWaypointLine(context);
-        drawWaypoint(MinecraftClient.getInstance(), RenderPipelines.LINES);
+        if (Flint.getUser().getMode().isEditor()) {
+            renderWaypoint(context);
+            drawWaypoint(MinecraftClient.getInstance(), WAYPOINT);
+            renderWaypointLine(context);
+            drawWaypoint(MinecraftClient.getInstance(), RenderPipelines.LINES);
+        } else {
+            Waypoints.waypointsLookingAt.clear();
+        }
     }
 
     private static void renderWaypoint(WorldRenderContext context) {
@@ -119,7 +123,7 @@ public class WaypointRenderPipeline implements ClientModInitializer {
                     if (distance <= 3 && distance >= 1.2) alpha = (int) ((distance-1.2)*255/2);
                     if (distance < 1.2) alpha = 0;
                     if (distance > 10) {
-                        boolean looking = isPlayerLookingAtPosition(pos, 3, 100);
+                        boolean looking = isPlayerLookingAtPosition(pos, (int) (3+(distance/20)), 1000);
                         if (looking) Waypoints.waypointsLookingAt.put(waypoint, distance);
                         else Waypoints.waypointsLookingAt.removeDouble(waypoint);
                     } else Waypoints.waypointsLookingAt.removeDouble(waypoint);

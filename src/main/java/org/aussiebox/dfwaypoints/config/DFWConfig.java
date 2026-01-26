@@ -9,7 +9,6 @@ import dev.isxander.yacl3.config.v2.api.ConfigClassHandler;
 import dev.isxander.yacl3.config.v2.api.SerialEntry;
 import dev.isxander.yacl3.config.v2.api.serializer.GsonConfigSerializerBuilder;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.StringIdentifiable;
@@ -32,11 +31,29 @@ public class DFWConfig {
                     .build())
             .build();
 
+    @SerialEntry(comment = "Allows waypoint creation outside of editor modes. Creating waypoints on plots you won't edit will take up unnecessary space.")
+    public static boolean allowCreationOutsideEditor = true;
+
+    @SerialEntry(comment = "The default state for the waypoint \"Render\" option.")
+    public static boolean defaultWaypointRenderState = true;
+
+    @SerialEntry(comment = "The default color for the waypoint \"Color\" option.")
+    public static Color defaultWaypointColor = new Color(0xFF8CF4E2);
+
+    @SerialEntry(comment = "The default color for the waypoint \"Text Color\" option.")
+    public static Color defaultTextColor = new Color(0xFFFFFFFF);
+
+    @SerialEntry(comment = "The default color for the waypoint \"Text Outline Color\" option.")
+    public static Color defaultTextOutlineColor = new Color(0xFF000000);
+
+    @SerialEntry(comment = "Shows a list of waypoints the player is looking at on the HUD.")
+    public static boolean showWaypointHud = true;
+
+    @SerialEntry(comment = "Sets the alignment of the waypoint list shown on the HUD.")
+    public static WaypointHudAlignment waypointHudAlignment = WaypointHudAlignment.MIDDLE_CENTER;
+
     @SerialEntry(comment = "Shows a tip reading \"[Keybind] Warp\" when looking towards a waypoint.")
     public static boolean showLookwarpTip = true;
-
-    @SerialEntry(comment = "Sets the alignment of waypoint lists shown on the HUD.")
-    public static WaypointHudAlignment waypointHudAlignment = WaypointHudAlignment.MIDDLE_CENTER;
 
     public static YetAnotherConfigLib getLibConfig() {
         YetAnotherConfigLib.Builder config = YetAnotherConfigLib.createBuilder()
@@ -44,14 +61,50 @@ public class DFWConfig {
                 .category(ConfigCategory.createBuilder()
                         .name(Text.translatable("config.dfwaypoints.category.general"))
                         .tooltip(Text.translatable("config.dfwaypoints.category.general.tooltip"))
+                        .option(Option.<Boolean>createBuilder()
+                                .name(Text.translatable("config.dfwaypoints.general.allow_creation_outside_editor"))
+                                .description(OptionDescription.of(Text.translatable("config.dfwaypoints.general.allow_creation_outside_editor.desc")))
+                                .binding(true, () -> allowCreationOutsideEditor, newVal -> allowCreationOutsideEditor = newVal)
+                                .controller(TickBoxControllerBuilder::create)
+                                .build())
                         .build())
                 .category(ConfigCategory.createBuilder()
                         .name(Text.translatable("config.dfwaypoints.category.rendering"))
                         .tooltip(Text.translatable("config.dfwaypoints.category.rendering.tooltip"))
+                        .group(OptionGroup.createBuilder()
+                                .name(Text.translatable("config.dfwaypoints.rendering.group.waypoint_appearance_defaults"))
+                                .option(Option.<Boolean>createBuilder()
+                                        .name(Text.translatable("config.dfwaypoints.rendering.default_waypoint_render_state"))
+                                        .description(OptionDescription.of(Text.translatable("config.dfwaypoints.rendering.default_waypoint_render_state.desc")))
+                                        .binding(true, () -> defaultWaypointRenderState, newVal -> defaultWaypointRenderState = newVal)
+                                        .controller(TickBoxControllerBuilder::create)
+                                        .build())
+                                .option(Option.<Color>createBuilder()
+                                        .name(Text.translatable("config.dfwaypoints.rendering.default_waypoint_color"))
+                                        .description(OptionDescription.of(Text.translatable("config.dfwaypoints.rendering.default_waypoint_color.desc")))
+                                        .binding(new Color(0xFF8CF4E2), () -> defaultWaypointColor, newVal -> defaultWaypointColor = newVal)
+                                        .controller(opt -> ColorControllerBuilder.create(opt)
+                                                .allowAlpha(true))
+                                        .build())
+                                .option(Option.<Color>createBuilder()
+                                        .name(Text.translatable("config.dfwaypoints.rendering.default_text_color"))
+                                        .description(OptionDescription.of(Text.translatable("config.dfwaypoints.rendering.default_text_color.desc")))
+                                        .binding(new Color(0xFFFFFFFF), () -> defaultTextColor, newVal -> defaultTextColor = newVal)
+                                        .controller(opt -> ColorControllerBuilder.create(opt)
+                                                .allowAlpha(true))
+                                        .build())
+                                .option(Option.<Color>createBuilder()
+                                        .name(Text.translatable("config.dfwaypoints.rendering.default_text_outline_color"))
+                                        .description(OptionDescription.of(Text.translatable("config.dfwaypoints.rendering.default_text_outline_color.desc")))
+                                        .binding(new Color(0xFF000000), () -> defaultTextOutlineColor, newVal -> defaultTextOutlineColor = newVal)
+                                        .controller(opt -> ColorControllerBuilder.create(opt)
+                                                .allowAlpha(true))
+                                        .build())
+                                .build())
                         .option(Option.<Boolean>createBuilder()
-                                .name(Text.translatable("config.dfwaypoints.rendering.show_lookwarp_tip"))
-                                .description(OptionDescription.of(Text.translatable("config.dfwaypoints.rendering.show_lookwarp_tip.desc")))
-                                .binding(true, () -> showLookwarpTip, newVal -> showLookwarpTip = newVal)
+                                .name(Text.translatable("config.dfwaypoints.rendering.show_waypoint_hud"))
+                                .description(OptionDescription.of(Text.translatable("config.dfwaypoints.rendering.show_waypoint_hud.desc")))
+                                .binding(true, () -> showWaypointHud, newVal -> showWaypointHud = newVal)
                                 .controller(TickBoxControllerBuilder::create)
                                 .build())
                         .option(Option.<WaypointHudAlignment>createBuilder()
@@ -62,6 +115,12 @@ public class DFWConfig {
                                         .enumClass(WaypointHudAlignment.class)
                                         .formatValue(value -> Text.translatable("config.dfwaypoints.alignment." + value.toString().toLowerCase()))
                                 )
+                                .build())
+                        .option(Option.<Boolean>createBuilder()
+                                .name(Text.translatable("config.dfwaypoints.rendering.show_lookwarp_tip"))
+                                .description(OptionDescription.of(Text.translatable("config.dfwaypoints.rendering.show_lookwarp_tip.desc")))
+                                .binding(true, () -> showLookwarpTip, newVal -> showLookwarpTip = newVal)
+                                .controller(TickBoxControllerBuilder::create)
                                 .build())
                         .build());
 
@@ -109,11 +168,6 @@ public class DFWConfig {
 
         config.category(waypointsCategory.build());
         return config.build();
-    }
-
-    public static int openConfig() {
-        MinecraftClient.getInstance().setScreen(DFWConfig.getLibConfig().generateScreen(MinecraftClient.getInstance().currentScreen));
-        return 0;
     }
 
     public enum WaypointHudAlignment implements StringIdentifiable {

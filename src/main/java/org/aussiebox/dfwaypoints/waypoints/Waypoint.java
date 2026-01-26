@@ -2,6 +2,7 @@ package org.aussiebox.dfwaypoints.waypoints;
 
 import com.google.gson.JsonObject;
 import net.minecraft.util.math.Vec3d;
+import org.aussiebox.dfwaypoints.config.DFWConfig;
 
 import java.awt.*;
 
@@ -19,9 +20,9 @@ public class Waypoint {
         this.type = type;
         this.position = position;
         this.render = true;
-        this.waypointColor = new Color(0xFF8CF4E2);
-        this.textColor = new Color(0xFFFFFFFF);
-        this.textOutlineColor = new Color(0xFF000000);
+        this.waypointColor = DFWConfig.defaultWaypointColor;
+        this.textColor = DFWConfig.defaultTextColor;
+        this.textOutlineColor = DFWConfig.defaultTextOutlineColor;
     }
 
     public static Waypoint fromJson(JsonObject json, WaypointType type) {
@@ -32,9 +33,9 @@ public class Waypoint {
 
         Waypoint waypoint = new Waypoint(name, type, new Vec3d(x, y, z));
         waypoint.render = !json.has("render") || json.get("render").getAsBoolean();
-        waypoint.waypointColor = json.has("waypoint_color") ? new Color(json.get("waypoint_color").getAsInt()) : new Color(0xFF8CF4E2);
-        waypoint.textColor = json.has("text_color") ? new Color(json.get("text_color").getAsInt()) : new Color(0xFFFFFFFF);
-        waypoint.textOutlineColor = json.has("text_outline_color") ? new Color(json.get("text_outline_color").getAsInt()) : new Color(0xFF000000);
+        waypoint.waypointColor = json.has("waypoint_color") ? new Color(json.get("waypoint_color").getAsInt()) : DFWConfig.defaultWaypointColor;
+        waypoint.textColor = json.has("text_color") ? new Color(json.get("text_color").getAsInt()) : DFWConfig.defaultTextColor;
+        waypoint.textOutlineColor = json.has("text_outline_color") ? new Color(json.get("text_outline_color").getAsInt()) : DFWConfig.defaultTextOutlineColor;
 
         return waypoint;
     }

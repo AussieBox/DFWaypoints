@@ -138,9 +138,6 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
                                         .then(waypointEntry
                                                 .executes((context) -> setColorSetting(context, StringArgumentType.getString(context, "waypoint"), ColorSetting.TEXT_OUTLINE_COLOR, context.getArgument("color", Integer.class)))))
                         )
-        ).then(
-                literal("config")
-                        .executes((context) -> DFWConfig.openConfig())
         );
     }
 
@@ -150,6 +147,14 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
         if (Flint.getUser().getPlot() == null) {
             MessageSystem.ErrorMessage(
                     Text.translatable("message.dfwaypoints.error.create.not_on_plot"),
+                    true
+            );
+            return 0;
+        }
+
+        if (!DFWConfig.allowCreationOutsideEditor && !Flint.getUser().getMode().isEditor()) {
+            MessageSystem.ErrorMessage(
+                    Text.translatable("message.dfwaypoints.error.create.not_in_editor"),
                     true
             );
             return 0;
