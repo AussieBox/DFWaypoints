@@ -15,6 +15,9 @@
   "message.dfwaypoints.error.create.waypoint_already_exists": "You already have a waypoint with this name!",
   "message.dfwaypoints.error.create.could_not_save": "DFWaypoints ran into an issue saving waypoint data. Your waypoint has been created, but may not save upon closing the game. ",
 
+  "message.dfwaypoints.error.position.not_on_plot": "You must be on a plot to set the position of waypoints!",
+  "message.dfwaypoints.success.position.set_position": "Position of waypoint ",
+
   "message.dfwaypoints.info.list.waypoint_list.1": "Your waypoints for ",
   "message.dfwaypoints.info.list.waypoint_list.2": "Plot ",
       "hover.dfwaypoints.info.list.teleport": "Teleport to waypoint",

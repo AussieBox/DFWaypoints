@@ -5,11 +5,12 @@ import net.minecraft.util.math.Vec3d;
 import org.aussiebox.dfwaypoints.config.DFWConfig;
 
 import java.awt.*;
+import java.text.DecimalFormat;
 
 public class Waypoint {
-    private final String name;
-    private final WaypointType type;
-    private final Vec3d position;
+    public String name;
+    public WaypointType type;
+    public Vec3d position;
     public boolean render;
     public Color waypointColor;
     public Color textColor;
@@ -41,11 +42,15 @@ public class Waypoint {
     }
 
     public JsonObject toJson() {
+        DecimalFormat df = new DecimalFormat("0");
+        df.setMaximumIntegerDigits(Integer.MAX_VALUE);
+        df.setMaximumFractionDigits(2);
+
         JsonObject json = new JsonObject();
         json.addProperty("name", name);
-        json.addProperty("x", position.x);
-        json.addProperty("y", position.y);
-        json.addProperty("z", position.z);
+        json.addProperty("x", Double.valueOf(df.format(position.x)));
+        json.addProperty("y", Double.valueOf(df.format(position.x)));
+        json.addProperty("z", Double.valueOf(df.format(position.x)));
         json.addProperty("render", render);
         json.addProperty("waypoint_color", waypointColor.getRGB());
         json.addProperty("text_color", textColor.getRGB());

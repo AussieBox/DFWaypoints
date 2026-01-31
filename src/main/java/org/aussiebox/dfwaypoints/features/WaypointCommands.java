@@ -1,6 +1,7 @@
 package org.aussiebox.dfwaypoints.features;
 
 import com.mojang.brigadier.arguments.BoolArgumentType;
+import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -28,6 +29,7 @@ import org.aussiebox.dfwaypoints.waypoints.Waypoints;
 
 import java.awt.*;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.List;
 
@@ -81,11 +83,60 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
                     return suggestionsBuilder.buildFuture();
                 });
 
+        var positionEntry1 = literal("position")
+                .then(
+                        literal("here")
+                                .then(waypointEntry
+                                        .executes(context -> setWaypointPosition(context, StringArgumentType.getString(context, "waypoint"), DFWaypoints.MC.player.getEntityPos()))
+                                )
+                )
+                .then(argument("x", DoubleArgumentType.doubleArg())
+                        .then(argument("y", DoubleArgumentType.doubleArg())
+                                .then(argument("z", DoubleArgumentType.doubleArg())
+                                        .then(waypointEntry
+                                                .executes(context -> setWaypointPosition(context, StringArgumentType.getString(context, "waypoint"), new Vec3d(DoubleArgumentType.getDouble(context, "x"), DoubleArgumentType.getDouble(context, "y"), DoubleArgumentType.getDouble(context, "z"))))
+                                        )
+                                )
+                        )
+                );
+
+        var positionEntry2 = literal("pos")
+                .then(
+                        literal("here")
+                                .then(waypointEntry
+                                        .executes(context -> setWaypointPosition(context, StringArgumentType.getString(context, "waypoint"), DFWaypoints.MC.player.getEntityPos()))
+                                )
+                )
+                .then(argument("x", DoubleArgumentType.doubleArg())
+                        .then(argument("y", DoubleArgumentType.doubleArg())
+                                .then(argument("z", DoubleArgumentType.doubleArg())
+                                        .then(waypointEntry
+                                                .executes(context -> setWaypointPosition(context, StringArgumentType.getString(context, "waypoint"), new Vec3d(DoubleArgumentType.getDouble(context, "x"), DoubleArgumentType.getDouble(context, "y"), DoubleArgumentType.getDouble(context, "z"))))
+                                        )
+                                )
+                        )
+                );
+
         return builder.then(
                 literal("create").then(
                         argument("waypoint", StringArgumentType.greedyString())
                                 .executes(context -> createWaypoint(context, StringArgumentType.getString(context, "waypoint")))
                 )
+        ).then(
+                literal("move")
+                        .then(argument("x", DoubleArgumentType.doubleArg())
+                                .then(argument("y", DoubleArgumentType.doubleArg())
+                                        .then(argument("z", DoubleArgumentType.doubleArg())
+                                                .then(waypointEntry
+                                                        .executes(context -> changeWaypointPosition(context, StringArgumentType.getString(context, "waypoint"), new Vec3d(DoubleArgumentType.getDouble(context, "x"), DoubleArgumentType.getDouble(context, "y"), DoubleArgumentType.getDouble(context, "z"))))
+                                                )
+                                        )
+                                )
+                        )
+        ).then(
+                positionEntry1
+        ).then(
+                positionEntry2
         ).then(
                 literal("list").executes(this::listWaypoints)
         ).then(
@@ -248,6 +299,74 @@ public class WaypointCommands implements CommandFeature, PacketListeningFeature 
                 MessageSystem.SuccessMessage(waypointCreatedMessage, true);
             } catch (IOException e) {
                 MessageSystem.ErrorMessage(waypointCreatedNotSavedMessage, true);
+            }
+        }
+        return 0;
+    }
+
+    public int setWaypointPosition(CommandContext<FabricClientCommandSource> context, String waypointName, Vec3d newPosition) {
+        if (DFWaypoints.MC.player == null) return 0;
+        if (Flint.getUser().getPlot() == null) {
+            MessageSystem.ErrorMessage(
+                    Text.translatable("message.dfwaypoints.error.position.not_on_plot"),
+                    true
+            );
+            return 0;
+        }
+
+        Map<WaypointType, Waypoint[]> waypoints = Waypoints.getWaypoints(Flint.getUser().getPlot().getId());
+
+        for (Waypoint[] waypointList : waypoints.values()) {
+            for (Waypoint waypoint : waypointList) {
+                if (Objects.equals(waypoint.getName(), waypointName)) {
+                    waypoint.position = newPosition;
+                    DecimalFormat df = new DecimalFormat("0");
+                    df.setMaximumIntegerDigits(Integer.MAX_VALUE);
+                    df.setMaximumFractionDigits(2);
+
+                    MessageSystem.SuccessMessage(
+                            Text.translatable("message.dfwaypoints.success.position.set_position")
+                                    .append(Text.literal(waypoint.getName()).withColor(waypoint.textColor.getRGB()))
+                                    .append(Text.translatable("message.dfwaypoints.success.appearance.set_to").withColor(0x8CF4E2))
+                                    .append(Text.literal("<" + df.format(waypoint.position.x) + ", " + df.format(waypoint.position.y)  + ", " + df.format(waypoint.position.z) + ">").withColor(0x2AFFAA))
+                                    .append(Text.translatable("message.dfwaypoints.general.period").withColor(0x8CF4E2)),
+                            true
+                    );
+                }
+            }
+        }
+        return 0;
+    }
+
+    public int changeWaypointPosition(CommandContext<FabricClientCommandSource> context, String waypointName, Vec3d change) {
+        if (DFWaypoints.MC.player == null) return 0;
+        if (Flint.getUser().getPlot() == null) {
+            MessageSystem.ErrorMessage(
+                    Text.translatable("message.dfwaypoints.error.position.not_on_plot"),
+                    true
+            );
+            return 0;
+        }
+
+        Map<WaypointType, Waypoint[]> waypoints = Waypoints.getWaypoints(Flint.getUser().getPlot().getId());
+
+        for (Waypoint[] waypointList : waypoints.values()) {
+            for (Waypoint waypoint : waypointList) {
+                if (Objects.equals(waypoint.getName(), waypointName)) {
+                    waypoint.position = waypoint.position.add(change);
+                    DecimalFormat df = new DecimalFormat("0");
+                    df.setMaximumIntegerDigits(Integer.MAX_VALUE);
+                    df.setMaximumFractionDigits(2);
+
+                    MessageSystem.SuccessMessage(
+                            Text.translatable("message.dfwaypoints.success.position.set_position")
+                                    .append(Text.literal(waypoint.getName()).withColor(waypoint.textColor.getRGB()))
+                                    .append(Text.translatable("message.dfwaypoints.success.appearance.set_to").withColor(0x8CF4E2))
+                                    .append(Text.literal("<" + df.format(waypoint.position.x) + ", " + df.format(waypoint.position.y)  + ", " + df.format(waypoint.position.z) + ">").withColor(0x2AFFAA))
+                                    .append(Text.translatable("message.dfwaypoints.general.period").withColor(0x8CF4E2)),
+                            true
+                    );
+                }
             }
         }
         return 0;
