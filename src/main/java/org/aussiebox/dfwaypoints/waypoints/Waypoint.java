@@ -49,8 +49,8 @@ public class Waypoint {
         JsonObject json = new JsonObject();
         json.addProperty("name", name);
         json.addProperty("x", Double.valueOf(df.format(position.x)));
-        json.addProperty("y", Double.valueOf(df.format(position.x)));
-        json.addProperty("z", Double.valueOf(df.format(position.x)));
+        json.addProperty("y", Double.valueOf(df.format(position.y)));
+        json.addProperty("z", Double.valueOf(df.format(position.z)));
         json.addProperty("render", render);
         json.addProperty("waypoint_color", waypointColor.getRGB());
         json.addProperty("text_color", textColor.getRGB());
